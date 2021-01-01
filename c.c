@@ -1,17 +1,19 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 struct Unit {
     char ws;
 };
 
 struct ModelStats { 
-    char ws; //
-    char bs; //
-    char s;  //
-    char t;  //
-    char w;  //
-    char i;  //
-    char a;  //
+    char ws; //Weapons Skill
+    char bs; //Ballistics Skill
+    char s;  //Strength
+    char t;  //Toughness
+    char w;  //Wounds
+    char i;  //Initiative
+    char a;  //Attacks
     char ld; //Leadership
     char sv; //Armour Save (n+)
 };
@@ -19,6 +21,10 @@ struct ModelStats {
 struct Model {
     struct ModelStats *stats;
 };
+
+char d(unsigned int n) {
+    return rand() % n + 1;
+}
 
 void showModel(struct Model *model) {
     char *format = "%s: WS %d, BS %d, S %d, T %d, W %d, I %d, A %d, Ld %d, Sv %d+\n";
@@ -38,9 +44,11 @@ int main() {
     struct Model vader;
     struct ModelStats vaderstats;
 
+    srand(time(NULL));
+
     vader.stats = &vaderstats;
 
-    initializeModel(&vader, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+    initializeModel(&vader, 1, 2, d(3), 4, 5, d(6), 7, 8, 9);
 
     showModel(&vader);
 
