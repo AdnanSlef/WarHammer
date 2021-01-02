@@ -51,7 +51,7 @@ double calcDistance(struct Point *c1, float r1, struct Point *c2, float r2) { //
             puts("ERROR: Negative distance; are the models overlapping?");
         }
     }
-    assert(dc - r1 - r2 >= -CLOSE_ENOUGH);
+    //assert(dc - r1 - r2 >= -CLOSE_ENOUGH); //doesn't seem to work in g++
     return dc - r1 - r2;
 }
 
@@ -78,6 +78,26 @@ void initializeModel(struct Model *model, char WS, char BS, char S, char T, char
     model->stats->ws = WS; model->stats->bs = BS; model->stats->s = S;
     model->stats->t  = T;  model->stats->w  = W;  model->stats->i = I;
     model->stats->a  = A;  model->stats->ld = Ld; model->stats->sv = Sv;
+    //currently this makes no sense as initialize model, since it just sets ModelStats stats.
+}
+
+void testBlastFunc() {
+    struct Model troopers[4];
+    struct ModelStats trooper_stats;
+    struct Point blast, trooper_poses[4];
+    double blastsize;
+    
+    for(int i=0; i<4; i++){
+        troopers[i].stats = &trooper_stats;
+        troopers[i].pos = trooper_poses+i; // &trooper_poses[i]
+    }
+    initializeModel(&troopers[0], 1, 2, 3, 4, 5, 6, 7, 8, 9);
+
+    blastsize = 3;
+    blast.x = 1.2; blast.y = 3.4, blast.z;
+
+    troopers[0].pos->x = 1.2;
+    troopers[3].pos->x = 7.9;
 }
 
 int main() {
@@ -103,6 +123,8 @@ int main() {
     obi.pos->x = 15; obi.pos->y = 50; obi.pos->z = 0;
 
     printf("Distance %f\n",calcDistance(vader.pos, vader.radius, obi.pos, obi.radius));
+
+    testBlastFunc();
 
     return 0;
 }
