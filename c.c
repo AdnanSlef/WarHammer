@@ -9,7 +9,6 @@
 
 struct Unit {
     struct Model *models[MAX_NUM_MODELS];
-    char ws;
     int num_models;
 };
 
@@ -41,6 +40,12 @@ char d(unsigned int n) {   //Roll dice with uniform discrete distribution
     return rand() % n + 1;
 }
 
+void setPoint(struct Point *p, double x, double y, double z) {
+    p->x=x;
+    p->y=y;
+    p->z=z;
+}
+
 double calcDistance(struct Point *c1, float r1, struct Point *c2, float r2) { //ignores vertical distance
     double dx = fabs(c1->x - c2->x);
     double dy = fabs(c1->y - c2->y);
@@ -61,7 +66,7 @@ int countBlast(struct Unit *unit, struct Point *center, double radius) {
     double dx, dy, modeldist;
     for(int i=0; i < unit->num_models; i++) {
         modeldist = calcDistance( unit->models[i]->pos, 0, center, 0 );
-        hits += fabs(modeldist) < CLOSE_ENOUGH;
+        hits += fabs(modeldist) - radius < CLOSE_ENOUGH;
     }
     return hits;
 }
@@ -82,6 +87,7 @@ void initializeModel(struct Model *model, char WS, char BS, char S, char T, char
 }
 
 void testBlastFunc() {
+    struct Unit squad;
     struct Model troopers[4];
     struct ModelStats trooper_stats;
     struct Point blast, trooper_poses[4];
@@ -94,10 +100,19 @@ void testBlastFunc() {
     initializeModel(&troopers[0], 1, 2, 3, 4, 5, 6, 7, 8, 9);
 
     blastsize = 3;
-    blast.x = 1.2; blast.y = 3.4, blast.z;
+    setPoint(&blast, 1.2, 3.4, 0);
 
-    troopers[0].pos->x = 1.2;
-    troopers[3].pos->x = 7.9;
+    setPoint(troopers[0].pos, 1.2, 3.4, 0);
+    setPoint(troopers[1].pos, 2.8, 3.4, 0);
+    setPoint(troopers[2].pos, 1.2, 6.5, 0);
+    setPoint(troopers[3].pos, 0.4, 4.2, 0);
+
+    squad.num_models = 4;
+    for(int i=0; i<squad.num_models; i++) {
+        squad.models[i] = &troopers[i];
+    }
+
+    printf("Blast hits: %d\n", countBlast(&squad, &blast, blastsize));
 }
 
 int main() {
@@ -119,8 +134,8 @@ int main() {
     vader.radius = 1.5;
     obi.radius = 1;
 
-    vader.pos->x = 12.5; vader.pos->y = 45; vader.pos->z = 0;
-    obi.pos->x = 15; obi.pos->y = 50; obi.pos->z = 0;
+    setPoint(vader.pos,12.5,45,0);
+    setPoint(obi.pos,15,50,0);
 
     printf("Distance %f\n",calcDistance(vader.pos, vader.radius, obi.pos, obi.radius));
 
