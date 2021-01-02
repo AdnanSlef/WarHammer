@@ -4,6 +4,8 @@
 #include <math.h>
 
 #define MAX_NUM_MODELS 15
+#define CLOSE_ENOUGH 0.1
+#define DEBUG 1
 
 struct Unit {
     struct Model *models[MAX_NUM_MODELS];
@@ -39,15 +41,30 @@ char d(unsigned int n) {   //Roll dice with uniform discrete distribution
     return rand() % n + 1;
 }
 
-float calcDistance(struct Point *c1, float r1, struct Point *c2, float r2) { //ignores vertical distance
+double calcDistance(struct Point *c1, float r1, struct Point *c2, float r2) { //ignores vertical distance
     double dx = fabs(c1->x - c2->x);
     double dy = fabs(c1->y - c2->y);
     double dc = sqrt(dx*dx + dy*dy);
-    printf("dx %f,  dy %f, dc %f\n", dx, dy, dc);
+    if (DEBUG) {
+        printf("dx %f,  dy %f, dc %f\n", dx, dy, dc);
+        if(dc < r1 + r2) {
+            puts("ERROR: Negative distance; are the models overlapping?");
+        }
+    }
+    assert(dc - r1 - r2 >= -CLOSE_ENOUGH);
     return dc - r1 - r2;
 }
 
-
+int countBlast(struct Unit *unit, struct Point *center, double radius) {
+    int hits = 0;
+    struct Point *modelpos;
+    double dx, dy, modeldist;
+    for(int i=0; i < unit->num_models; i++) {
+        modeldist = calcDistance( unit->models[i]->pos, 0, center, 0 );
+        hits += fabs(modeldist) < CLOSE_ENOUGH;
+    }
+    return hits;
+}
 
 void showModel(struct Model *model) {
     char *format = "%s: WS %d, BS %d, S %d, T %d, W %d, I %d, A %d, Ld %d, Sv %d+\n";
