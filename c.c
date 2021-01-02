@@ -3,14 +3,18 @@
 #include <time.h>
 #include <math.h>
 
+#define MAX_NUM_MODELS 15
+
 struct Unit {
+    struct Model *models[MAX_NUM_MODELS];
     char ws;
+    int num_models;
 };
 
 struct Point {
-    float x;
-    float y;
-    float z; //height
+    double x;
+    double y;
+    double z; //height
 };
 
 struct ModelStats { 
@@ -28,7 +32,7 @@ struct ModelStats {
 struct Model {
     struct ModelStats *stats;
     struct Point *pos; //Position
-    float radius;
+    double radius;
 };
 
 char d(unsigned int n) {   //Roll dice with uniform discrete distribution
@@ -36,11 +40,14 @@ char d(unsigned int n) {   //Roll dice with uniform discrete distribution
 }
 
 float calcDistance(struct Point *c1, float r1, struct Point *c2, float r2) { //ignores vertical distance
-    float dx = abs(c1->x - c2->x);
-    float dy = abs(c1->y - c2->y);
-    float dc = sqrt(dx*dx + dy*dy);
+    double dx = fabs(c1->x - c2->x);
+    double dy = fabs(c1->y - c2->y);
+    double dc = sqrt(dx*dx + dy*dy);
+    printf("dx %f,  dy %f, dc %f\n", dx, dy, dc);
     return dc - r1 - r2;
 }
+
+
 
 void showModel(struct Model *model) {
     char *format = "%s: WS %d, BS %d, S %d, T %d, W %d, I %d, A %d, Ld %d, Sv %d+\n";
